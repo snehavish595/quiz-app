@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/snehavish595/quiz-app.git/static/css/main.b9acc7e1.css",
+    "main.js": "/snehavish595/quiz-app.git/static/js/main.be6a2eb2.js",
+    "index.html": "/snehavish595/quiz-app.git/index.html",
+    "main.b9acc7e1.css.map": "/snehavish595/quiz-app.git/static/css/main.b9acc7e1.css.map",
+    "main.be6a2eb2.js.map": "/snehavish595/quiz-app.git/static/js/main.be6a2eb2.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b9acc7e1.css",
+    "static/js/main.be6a2eb2.js"
+  ]
+}
