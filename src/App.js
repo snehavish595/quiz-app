@@ -16,7 +16,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/quiz/:category" element={<QuizPage />} />
+          <Route path="/quiz/:categoryId" element={<QuizPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           {/* Catch-all route for unmatched URLs */}

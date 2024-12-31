@@ -1,0 +1,33 @@
+.quiz-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #f7fafc;
+    border-radius: 12px;
+  }
+  
+  button {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  h1, h2 {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+  }
+  
+  .bg-gray-200 {
+    background-color: #edf2f7;
+  }
+  
+  .bg-blue-500 {
+    background-color: #4299e1;
+  }
+  
+  .bg-green-500 {
+    background-color: #38a169;
+  }
+  
+  .bg-red-500 {
+    background-color: #e53e3e;
+  }
+  

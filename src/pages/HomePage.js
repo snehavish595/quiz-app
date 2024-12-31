@@ -19,13 +19,10 @@ const HomePage = () => {
       { opacity: 0, scale: 0.8 },
       { opacity: 1, scale: 1, duration: 0.8, delay: 1 }
     );
-    
   }, []);
 
   return (
     <div className="bg-gray-100 text-gray-800">
-      {/* Navbar */}
-
       {/* Hero Section */}
       <header className="h-screen flex flex-col justify-center items-center bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
         <h1 className="text-6xl font-extrabold mb-4 hero-heading">
@@ -77,71 +74,191 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Latest Quizzes Section */}
+      {/* Categories Section */}
+      {/* Categories Section */}
+<section className="py-16 bg-gray-50">
+  <div className="container mx-auto px-6">
+    {/* Section Heading */}
+    <div className="flex justify-between items-center mb-12">
+      <h2 className="text-4xl font-bold text-gray-800">Explore Categories</h2>
+      <Link
+        to="/categories"
+        className="text-blue-600 font-semibold hover:underline"
+      >
+        View All
+      </Link>
+    </div>
+
+    {/* Categories Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {/* Card 1 */}
+      <div className="relative group bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300">
+        <div
+          className="absolute inset-0 bg-blue-500 opacity-10 group-hover:opacity-20 transition duration-300 rounded-lg"
+        ></div>
+        <div className="relative p-6 text-center">
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            Science
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Dive into fascinating scientific facts.
+          </p>
+          <Link
+            to="/quiz/science"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md font-medium hover:bg-blue-600 transition duration-300"
+          >
+            Start Quiz
+          </Link>
+        </div>
+      </div>
+
+      {/* Card 2 */}
+      <div className="relative group bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300">
+        <div
+          className="absolute inset-0 bg-green-500 opacity-10 group-hover:opacity-20 transition duration-300 rounded-lg"
+        ></div>
+        <div className="relative p-6 text-center">
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            History
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Explore historic events and milestones.
+          </p>
+          <Link
+            to="/quiz/history"
+            className="px-4 py-2 bg-green-500 text-white rounded-md font-medium hover:bg-green-600 transition duration-300"
+          >
+            Start Quiz
+          </Link>
+        </div>
+      </div>
+
+      {/* Card 3 */}
+      <div className="relative group bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300">
+        <div
+          className="absolute inset-0 bg-yellow-500 opacity-10 group-hover:opacity-20 transition duration-300 rounded-lg"
+        ></div>
+        <div className="relative p-6 text-center">
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            Technology
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Test your knowledge about tech trends.
+          </p>
+          <Link
+            to="/quiz/technology"
+            className="px-4 py-2 bg-yellow-500 text-white rounded-md font-medium hover:bg-yellow-600 transition duration-300"
+          >
+            Start Quiz
+          </Link>
+        </div>
+      </div>
+
+      {/* Card 4 */}
+      <div className="relative group bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300">
+        <div
+          className="absolute inset-0 bg-purple-500 opacity-10 group-hover:opacity-20 transition duration-300 rounded-lg"
+        ></div>
+        <div className="relative p-6 text-center">
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            General Knowledge
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Challenge yourself with trivia questions.
+          </p>
+          <Link
+            to="/quiz/general-knowledge"
+            className="px-4 py-2 bg-purple-500 text-white rounded-md font-medium hover:bg-purple-600 transition duration-300"
+          >
+            Start Quiz
+          </Link>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
       {/* Testimonials Section */}
       <section className="py-16 bg-gray-100 text-gray-800">
         <h2 className="text-4xl font-bold text-center mb-12">
           What Our Users Say
         </h2>
-        <div className="container mx-auto px-6">
-          <div className="relative overflow-hidden">
-            <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-              id="testimonial-container"
-            >
-              <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                <p className="text-lg italic">
-                  &ldquo;This app transformed my learning experience. It's fun
-                  and effective!&rdquo;
-                </p>
-                <div className="mt-4 flex items-center">
-                  <img
-                    src="https://via.placeholder.com/50"
-                    alt="User"
-                    className="w-12 h-12 rounded-full mr-4"
-                  />
-                  <div>
-                    <h3 className="text-sm font-bold">- Jane Doe</h3>
-                    <span className="text-gray-500 text-sm">Student</span>
-                  </div>
-                </div>
+        <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-6">
+          <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
+            <p className="text-lg italic">
+              &ldquo;This app transformed my learning experience. It's fun and
+              effective!&rdquo;
+            </p>
+            <div className="mt-4 flex items-center">
+              <img
+                src="https://via.placeholder.com/50"
+                alt="User"
+                className="w-12 h-12 rounded-full mr-4"
+              />
+              <div>
+                <h3 className="text-sm font-bold">- Jane Doe</h3>
+                <span className="text-gray-500 text-sm">Student</span>
               </div>
-              <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                <p className="text-lg italic">
-                  &ldquo;Absolutely love the diverse topics. Perfect for
-                  improving my general knowledge!&rdquo;
-                </p>
-                <div className="mt-4 flex items-center">
-                  <img
-                    src="https://via.placeholder.com/50"
-                    alt="User"
-                    className="w-12 h-12 rounded-full mr-4"
-                  />
-                  <div>
-                    <h3 className="text-sm font-bold">- John Smith</h3>
-                    <span className="text-gray-500 text-sm">Professional</span>
-                  </div>
-                </div>
+            </div>
+          </div>
+          <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
+            <p className="text-lg italic">
+              &ldquo;Absolutely love the diverse topics. Perfect for improving
+              my general knowledge!&rdquo;
+            </p>
+            <div className="mt-4 flex items-center">
+              <img
+                src="https://via.placeholder.com/50"
+                alt="User"
+                className="w-12 h-12 rounded-full mr-4"
+              />
+              <div>
+                <h3 className="text-sm font-bold">- John Smith</h3>
+                <span className="text-gray-500 text-sm">Professional</span>
               </div>
-              <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                <p className="text-lg italic">
-                  &ldquo;The user interface is sleek, and the quizzes are super
-                  engaging. Highly recommend it!&rdquo;
-                </p>
-                <div className="mt-4 flex items-center">
-                  <img
-                    src="https://via.placeholder.com/50"
-                    alt="User"
-                    className="w-12 h-12 rounded-full mr-4"
-                  />
-                  <div>
-                    <h3 className="text-sm font-bold">- Sarah Lee</h3>
-                    <span className="text-gray-500 text-sm">Educator</span>
-                  </div>
-                </div>
+            </div>
+          </div>
+          <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
+            <p className="text-lg italic">
+              &ldquo;The user interface is sleek, and the quizzes are super
+              engaging. Highly recommend it!&rdquo;
+            </p>
+            <div className="mt-4 flex items-center">
+              <img
+                src="https://via.placeholder.com/50"
+                alt="User"
+                className="w-12 h-12 rounded-full mr-4"
+              />
+              <div>
+                <h3 className="text-sm font-bold">- Sarah Lee</h3>
+                <span className="text-gray-500 text-sm">Educator</span>
               </div>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Newsletter Signup Section */}
+      <section className="py-12 bg-blue-600 text-white text-center">
+        <h2 className="text-4xl font-bold mb-4">Stay Updated</h2>
+        <p className="text-lg mb-6">
+          Subscribe to our newsletter for the latest quizzes and updates.
+        </p>
+        <form className="flex flex-col md:flex-row justify-center items-center gap-4">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="w-full md:w-auto px-4 py-2 rounded-md text-gray-800"
+          />
+          <button
+            type="submit"
+            className="bg-yellow-400 px-6 py-2 rounded-md font-bold hover:bg-yellow-500 transition duration-300"
+          >
+            Subscribe
+          </button>
+        </form>
       </section>
 
       {/* Footer */}
