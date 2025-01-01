@@ -1,24 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
 
 const QuizPage = () => {
-  const { categoryId } = useParams(); // Get categoryId from URL
+  const { categoryId } = useParams();
   const [questions, setQuestions] = useState([]);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [selectedAnswers, setSelectedAnswers] = useState({}); // Store selected answers
-  const [isFinished, setIsFinished] = useState(false); // Track if the quiz is finished
-  const navigate = useNavigate(); // For navigation
+  const [quizFinished, setQuizFinished] = useState(false);
+  const [score, setScore] = useState(0);
+
+  const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (categoryId) {
-      fetchQuestionsWithRetry(categoryId);
+    if (!hasFetched.current) {
+      fetchQuestions(categoryId);
+      hasFetched.current = true;
     }
   }, [categoryId]);
 
-  // Function to fetch questions with retry logic for rate limits
-  const fetchQuestionsWithRetry = async (categoryId, retries = 3, delay = 2000) => {
+  const fetchQuestions = async (categoryId) => {
     setLoading(true);
     setError("");
 
@@ -28,34 +30,29 @@ const QuizPage = () => {
       );
 
       if (response.data.response_code === 0) {
-        const fetchedQuestions = response.data.results.map((question) => ({
-          ...question,
-          shuffledAnswers: shuffleAnswers([
-            ...question.incorrect_answers,
-            question.correct_answer,
-          ]),
-        }));
-        setQuestions(fetchedQuestions);
-      } else if (response.data.response_code === 1) {
-        setError("No questions available for this category.");
+        setQuestions(
+          response.data.results.map((question) => ({
+            ...question,
+            shuffledAnswers: shuffleAnswers([
+              ...question.incorrect_answers,
+              question.correct_answer,
+            ]),
+          }))
+        );
       } else {
-        setError("Invalid request. Please try again.");
+        setError("No questions available for this category.");
       }
     } catch (err) {
-      if (err.response?.status === 429 && retries > 0) {
-        if (!error) { // Only show this once
-          setError("Rate limit exceeded. Retrying...");
-        }
-        setTimeout(() => fetchQuestionsWithRetry(categoryId, retries - 1, delay), delay);
+      if (err.response?.status === 429) {
+        setError("Rate limit hit. Please try again later.");
       } else {
-        setError("An error occurred while fetching questions. Please try again.");
+        setError("Failed to fetch questions. Please try again.");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Shuffle answers to randomize the order
   const shuffleAnswers = (answers) => {
     return answers
       .map((answer) => ({ answer, sort: Math.random() }))
@@ -63,81 +60,99 @@ const QuizPage = () => {
       .map(({ answer }) => answer);
   };
 
-  // Handle selecting an answer
   const handleAnswerSelect = (questionIndex, selectedAnswer) => {
-    setSelectedAnswers((prevSelectedAnswers) => ({
-      ...prevSelectedAnswers,
+    setSelectedAnswers((prevAnswers) => ({
+      ...prevAnswers,
       [questionIndex]: selectedAnswer,
     }));
   };
 
-  // Handle finish quiz
   const handleFinishQuiz = () => {
-    setIsFinished(true);
-    // Optionally, navigate to a results page or show results here
-    navigate("/results"); // Redirect to results page after finishing
+    const calculatedScore = questions.reduce((total, question, index) => {
+      if (selectedAnswers[index] === question.correct_answer) {
+        return total + 1;
+      }
+      return total;
+    }, 0);
+
+    setScore(calculatedScore);
+    setQuizFinished(true);
   };
 
+  if (loading) {
+    return <p className="text-center text-blue-500">Loading...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500">{error}</p>;
+  }
+
+  if (quizFinished) {
+    const percentage = (score / questions.length) * 100;
+    return (
+      <div className="quiz-results p-6 max-w-3xl mx-auto text-center mt-20"> {/* Added mt-20 */}
+        <h1 className="text-4xl font-extrabold text-green-600 mb-6">Quiz Completed!</h1>
+        <div className="flex justify-center items-center mb-6">
+          <div className="w-24 h-24 rounded-full border-4 border-green-600 flex items-center justify-center">
+            <p className="text-3xl font-bold text-green-600">{percentage.toFixed(0)}%</p>
+          </div>
+        </div>
+        <p className="text-xl text-gray-800 mb-6">
+          You scored <span className="font-bold text-blue-500">{score}</span> out of{" "}
+          <span className="font-bold">{questions.length}</span>.
+        </p>
+        <button
+          className="bg-gradient-to-r from-blue-400 to-blue-600 text-white py-3 px-6 rounded-xl shadow-lg hover:scale-105 transform transition-all duration-300"
+          onClick={() => window.location.reload()}
+        >
+          Retake Quiz
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="quiz-container p-6 bg-gray-50 rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Quiz Time!</h1>
-
-      {loading ? (
-        <div className="flex justify-center">
-          <p className="text-lg font-semibold">Loading questions...</p>
+    <div className="quiz-container p-6 max-w-3xl mx-auto mt-16">
+      <h1 className="text-4xl font-extrabold text-center mb-8 text-blue-700">
+        Quiz Questions
+      </h1>
+      {questions.map((question, index) => (
+        <div
+          key={index}
+          className="question-card p-6 mb-6 border-2 rounded-xl shadow-lg bg-gradient-to-r from-blue-100 to-indigo-200"
+        >
+          <h2
+            className="text-xl font-semibold text-gray-800 mb-4"
+            dangerouslySetInnerHTML={{
+              __html: `${index + 1}. ${question.question}`,
+            }}
+          />
+          <ul className="options-list space-y-4">
+            {question.shuffledAnswers.map((answer, i) => (
+              <li key={i}>
+                <button
+                  className={`w-full py-3 px-5 rounded-md shadow-lg text-left transition duration-300 ${
+                    selectedAnswers[index] === answer
+                      ? "bg-blue-500 text-white transform scale-105"
+                      : "bg-white hover:bg-blue-50"
+                  }`}
+                  dangerouslySetInnerHTML={{ __html: answer }}
+                  onClick={() => handleAnswerSelect(index, answer)}
+                />
+              </li>
+            ))}
+          </ul>
         </div>
-      ) : error ? (
-        <div className="text-center text-red-500">
-          <p>{error}</p>
-        </div>
-      ) : (
-        <div>
-          {questions.map((question, index) => (
-            <div key={index} className="mb-6 p-4 bg-white rounded-lg shadow-md">
-              <h3
-                className="font-medium text-lg mb-2"
-                dangerouslySetInnerHTML={{
-                  __html: `${index + 1}. ${question.question}`,
-                }}
-              />
-              <ul className="mt-2">
-                {question.shuffledAnswers.map((answer, i) => (
-                  <li key={i} className="mt-2">
-                    <button
-                      className={`w-full p-3 rounded-lg text-left ${
-                        selectedAnswers[index] === answer
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 hover:bg-gray-300"
-                      } shadow-md`}
-                      dangerouslySetInnerHTML={{ __html: answer }}
-                      onClick={() => handleAnswerSelect(index, answer)} // Set selected answer
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {!isFinished && questions.length > 0 && (
-        <div className="text-center mt-6">
-          <button
-            onClick={handleFinishQuiz}
-            className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
-          >
-            Finish Quiz
-          </button>
-        </div>
-      )}
-
-      {isFinished && (
-        <div className="text-center mt-6">
-          <p className="font-semibold text-xl">Quiz Completed!</p>
-          <p className="text-lg">Your score is: {/* Calculate score here */}</p>
-          {/* Optionally, you can display the score here */}
-        </div>
-      )}
+      ))}
+      <div className="text-center mt-20">
+        <button
+          className="bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-xl shadow-lg hover:scale-105 transform transition-all duration-300"
+          onClick={handleFinishQuiz}
+          disabled={Object.keys(selectedAnswers).length !== questions.length}
+        >
+          Finish Quiz
+        </button>
+      </div>
     </div>
   );
 };

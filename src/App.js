@@ -11,19 +11,23 @@ import CategoriesPage from "./pages/CategoriesPage";
 const App = () => {
   return (
     <BrowserRouter>
-      <Navbar />
-      <div className="flex-grow">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/quiz/:categoryId" element={<QuizPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          {/* Catch-all route for unmatched URLs */}
-          <Route path="*" element={<HomePage />} />
-        </Routes>
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/quiz/:categoryId" element={<QuizPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            {/* Catch-all route for unmatched URLs */}
+            <Route path="*" element={<HomePage />} />
+          </Routes>
+        </main>
+
+        <Footer />
       </div>
-      <Footer />
     </BrowserRouter>
   );
 };
