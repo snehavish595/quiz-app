@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 const QuizPage = () => {
   const { categoryId } = useParams();
@@ -10,23 +11,24 @@ const QuizPage = () => {
   const [loading, setLoading] = useState(false);
   const [quizFinished, setQuizFinished] = useState(false);
   const [score, setScore] = useState(0);
+  const [difficulty, setDifficulty] = useState("easy");
 
   const hasFetched = useRef(false);
 
   useEffect(() => {
     if (!hasFetched.current) {
-      fetchQuestions(categoryId);
+      fetchQuestions(categoryId, difficulty);
       hasFetched.current = true;
     }
-  }, [categoryId]);
+  }, [categoryId, difficulty]);
 
-  const fetchQuestions = async (categoryId) => {
+  const fetchQuestions = async (categoryId, difficulty) => {
     setLoading(true);
     setError("");
 
     try {
       const response = await axios.get(
-        `https://opentdb.com/api.php?amount=10&category=${categoryId}&type=multiple`
+        `https://opentdb.com/api.php?amount=10&category=${categoryId}&difficulty=${difficulty}&type=multiple`
       );
 
       if (response.data.response_code === 0) {
@@ -40,7 +42,7 @@ const QuizPage = () => {
           }))
         );
       } else {
-        setError("No questions available for this category.");
+        setError("No questions available for this category and difficulty.");
       }
     } catch (err) {
       if (err.response?.status === 429) {
@@ -90,15 +92,22 @@ const QuizPage = () => {
   if (quizFinished) {
     const percentage = (score / questions.length) * 100;
     return (
-      <div className="quiz-results p-6 max-w-3xl mx-auto text-center mt-20"> {/* Added mt-20 */}
-        <h1 className="text-4xl font-extrabold text-green-600 mb-6">Quiz Completed!</h1>
+      <motion.div
+        className="quiz-results p-6 max-w-3xl mx-auto text-center mt-20"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-extrabold text-green-600 mb-6">
+          Quiz Completed!
+        </h1>
         <div className="flex justify-center items-center mb-6">
           <div className="w-24 h-24 rounded-full border-4 border-green-600 flex items-center justify-center">
             <p className="text-3xl font-bold text-green-600">{percentage.toFixed(0)}%</p>
           </div>
         </div>
         <p className="text-xl text-gray-800 mb-6">
-          You scored <span className="font-bold text-blue-500">{score}</span> out of{" "}
+          You scored <span className="font-bold text-blue-500">{score}</span> out of {" "}
           <span className="font-bold">{questions.length}</span>.
         </p>
         <button
@@ -107,7 +116,7 @@ const QuizPage = () => {
         >
           Retake Quiz
         </button>
-      </div>
+      </motion.div>
     );
   }
 
@@ -116,10 +125,26 @@ const QuizPage = () => {
       <h1 className="text-4xl font-extrabold text-center mb-8 text-blue-700">
         Quiz Questions
       </h1>
+      <label htmlFor="difficulty" className="block mb-4 text-lg font-medium">
+        Select Difficulty:
+      </label>
+      <select
+        id="difficulty"
+        value={difficulty}
+        onChange={(e) => setDifficulty(e.target.value)}
+        className="border border-gray-300 rounded p-2 mb-8"
+      >
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
       {questions.map((question, index) => (
-        <div
+        <motion.div
           key={index}
           className="question-card p-6 mb-6 border-2 rounded-xl shadow-lg bg-gradient-to-r from-blue-100 to-indigo-200"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
         >
           <h2
             className="text-xl font-semibold text-gray-800 mb-4"
@@ -142,7 +167,7 @@ const QuizPage = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
       ))}
       <div className="text-center mt-20">
         <button
