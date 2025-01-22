@@ -16,7 +16,8 @@ const QuizPage = () => {
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (!hasFetched.current) {
+    if (!hasFetched.current) { console.log("Category ID:", categoryId);
+
       fetchQuestions(categoryId, difficulty);
       hasFetched.current = true;
     }
@@ -25,12 +26,12 @@ const QuizPage = () => {
   const fetchQuestions = async (categoryId, difficulty) => {
     setLoading(true);
     setError("");
-
+  
     try {
       const response = await axios.get(
         `https://opentdb.com/api.php?amount=10&category=${categoryId}&difficulty=${difficulty}&type=multiple`
       );
-
+  
       if (response.data.response_code === 0) {
         setQuestions(
           response.data.results.map((question) => ({
@@ -45,16 +46,13 @@ const QuizPage = () => {
         setError("No questions available for this category and difficulty.");
       }
     } catch (err) {
-      if (err.response?.status === 429) {
-        setError("Rate limit hit. Please try again later.");
-      } else {
-        setError("Failed to fetch questions. Please try again.");
-      }
+      console.error("API Error:", err);
+      setError("Failed to fetch questions. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
+  
   const shuffleAnswers = (answers) => {
     return answers
       .map((answer) => ({ answer, sort: Math.random() }))

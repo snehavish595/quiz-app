@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { gsap } from "gsap";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -35,7 +34,9 @@ const CategoriesPage = () => {
           const fetchedCategories = response.data.trivia_categories.map((category) => ({
             id: category.id,
             name: category.name,
-            image: `https://source.unsplash.com/300x200/?${encodeURIComponent(category.name)}`,
+            image: `https://source.unsplash.com/500x300/?quiz,${encodeURIComponent(
+              category.name
+            )}`,
           }));
           setCategories(fetchedCategories);
           localStorage.setItem("categories", JSON.stringify(fetchedCategories));
@@ -52,44 +53,52 @@ const CategoriesPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10">
-      <h1 className="text-4xl font-bold text-center mb-8 mt-16">Discover Quiz Categories</h1>
-      <div className="container mx-auto px-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search categories..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded shadow focus:outline-none focus:ring focus:ring-blue-300"
-        />
-      </div>
-      {filteredCategories.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 container mx-auto px-4">
-          {filteredCategories.map((category) => (
-            <div
-              key={category.id}
-              className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300 category-card"
-            >
-              <img
-                src={category.image}
-                alt={category.name}
-                className="w-full h-40 object-cover rounded-md mb-4"
-              />
-              <h2 className="text-xl font-bold mb-2 text-center">
-                {category.name}
-              </h2>
-              <Link
-                to={`/quiz/${category.id}`}
-                className="block bg-blue-500 text-white text-center py-2 rounded hover:bg-blue-700 transition duration-300"
-              >
-                Start Quiz
-              </Link>
-            </div>
-          ))}
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white py-16">
+      <div className="container mx-auto px-6">
+        <h1 className="text-5xl font-extrabold text-center mb-12 text-teal-400">
+          Quiz Categories
+        </h1>
+        <div className="flex justify-center mb-12">
+          <input
+            type="text"
+            placeholder="Search categories..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full max-w-lg px-5 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 shadow-lg focus:outline-none focus:ring-4 focus:ring-teal-400"
+          />
         </div>
-      ) : (
-        <p className="text-center text-lg">No categories found...</p>
-      )}
+        {filteredCategories.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {filteredCategories.map((category) => (
+              <div
+                key={category.id}
+                className="relative bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300"
+              >
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="w-full h-40 object-cover opacity-90 hover:opacity-100 transition duration-300"
+                  onError={(e) =>
+                    (e.target.src = "https://via.placeholder.com/500x300?text=No+Image")
+                  }
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                <div className="absolute bottom-4 left-4">
+                  <h2 className="text-lg font-bold text-white">{category.name}</h2>
+                </div>
+                <Link
+                  to={`/quiz/${category.id}`}
+                  className="absolute bottom-4 right-4 bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300"
+                >
+                  Start Quiz
+                </Link>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-lg">No categories found...</p>
+        )}
+      </div>
     </div>
   );
 };
