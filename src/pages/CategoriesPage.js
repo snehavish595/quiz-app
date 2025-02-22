@@ -8,18 +8,9 @@ const CategoriesPage = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   // Debounce function
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return (...args) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-  };
-
-  // Handle debounced search
   useEffect(() => {
-    const debounced = debounce((value) => setDebouncedSearch(value), 300);
-    debounced(search);
+    const handler = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(handler);
   }, [search]);
 
   // Fetch categories with caching
@@ -34,9 +25,6 @@ const CategoriesPage = () => {
           const fetchedCategories = response.data.trivia_categories.map((category) => ({
             id: category.id,
             name: category.name,
-            image: `https://source.unsplash.com/500x300/?quiz,${encodeURIComponent(
-              category.name
-            )}`,
           }));
           setCategories(fetchedCategories);
           localStorage.setItem("categories", JSON.stringify(fetchedCategories));
@@ -53,42 +41,35 @@ const CategoriesPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white py-16">
+    <div className="min-h-screen bg-gray-100 text-gray-900 py-16 pt-24">
       <div className="container mx-auto px-6">
-        <h1 className="text-5xl font-extrabold text-center mb-12 text-teal-400">
-          Quiz Categories
+        <h1 className="text-5xl font-extrabold text-center mb-12 text-gray-800">
+          Choose a Category
         </h1>
-        <div className="flex justify-center mb-12">
+        <div className="flex justify-center mb-10">
           <input
             type="text"
             placeholder="Search categories..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full max-w-lg px-5 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 shadow-lg focus:outline-none focus:ring-4 focus:ring-teal-400"
+            className="w-full max-w-lg px-5 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-500 border border-gray-300 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
         {filteredCategories.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {filteredCategories.map((category) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
+            {filteredCategories.map((category, index) => (
               <div
                 key={category.id}
-                className="relative bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300"
+                className="relative bg-white shadow-xl rounded-2xl overflow-hidden p-6 text-center transition-transform transform hover:-translate-y-2 border-t-4 border-purple-500"
               >
-                <img
-                  src={category.image}
-                  alt={category.name}
-                  className="w-full h-40 object-cover opacity-90 hover:opacity-100 transition duration-300"
-                  onError={(e) =>
-                    (e.target.src = "https://via.placeholder.com/500x300?text=No+Image")
-                  }
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-                <div className="absolute bottom-4 left-4">
-                  <h2 className="text-lg font-bold text-white">{category.name}</h2>
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-500 text-white w-16 h-16 flex items-center justify-center rounded-full shadow-md">
+                  🏆
                 </div>
+                <h2 className="text-xl font-bold text-gray-800 mt-6 mb-4">{category.name}</h2>
+                <p className="text-gray-600 text-sm mb-4">Test your knowledge with this category</p>
                 <Link
                   to={`/quiz/${category.id}`}
-                  className="absolute bottom-4 right-4 bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300"
+                  className="inline-block px-6 py-3 bg-purple-500 text-white font-semibold rounded-lg shadow-md hover:bg-purple-600 transition-all duration-300"
                 >
                   Start Quiz
                 </Link>
@@ -96,7 +77,7 @@ const CategoriesPage = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-lg">No categories found...</p>
+          <p className="text-center text-lg text-gray-600">No categories found...</p>
         )}
       </div>
     </div>
