@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 
 const QuizPage = () => {
   const { categoryId } = useParams();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [error, setError] = useState("");
@@ -12,11 +13,13 @@ const QuizPage = () => {
   const [quizFinished, setQuizFinished] = useState(false);
   const [score, setScore] = useState(0);
   const [difficulty, setDifficulty] = useState("easy");
+  const [reviewMode, setReviewMode] = useState(false);
 
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (!hasFetched.current) { console.log("Category ID:", categoryId);
+    if (!hasFetched.current) {
+      console.log("Category ID:", categoryId);
 
       fetchQuestions(categoryId, difficulty);
       hasFetched.current = true;
@@ -26,12 +29,12 @@ const QuizPage = () => {
   const fetchQuestions = async (categoryId, difficulty) => {
     setLoading(true);
     setError("");
-  
+
     try {
       const response = await axios.get(
         `https://opentdb.com/api.php?amount=10&category=${categoryId}&difficulty=${difficulty}&type=multiple`
       );
-  
+
       if (response.data.response_code === 0) {
         setQuestions(
           response.data.results.map((question) => ({
@@ -52,7 +55,7 @@ const QuizPage = () => {
       setLoading(false);
     }
   };
-  
+
   const shuffleAnswers = (answers) => {
     return answers
       .map((answer) => ({ answer, sort: Math.random() }))
@@ -87,7 +90,7 @@ const QuizPage = () => {
     return <p className="text-center text-red-500">{error}</p>;
   }
 
-  if (quizFinished) {
+  if (quizFinished && !reviewMode) {
     const percentage = (score / questions.length) * 100;
     return (
       <motion.div
@@ -101,18 +104,33 @@ const QuizPage = () => {
         </h1>
         <div className="flex justify-center items-center mb-6">
           <div className="w-24 h-24 rounded-full border-4 border-green-600 flex items-center justify-center">
-            <p className="text-3xl font-bold text-green-600">{percentage.toFixed(0)}%</p>
+            <p className="text-3xl font-bold text-green-600">
+              {percentage.toFixed(0)}%
+            </p>
           </div>
         </div>
         <p className="text-xl text-gray-800 mb-6">
-          You scored <span className="font-bold text-blue-500">{score}</span> out of {" "}
-          <span className="font-bold">{questions.length}</span>.
+          You scored <span className="font-bold text-blue-500">{score}</span>{" "}
+          out of <span className="font-bold">{questions.length}</span>.
         </p>
         <button
           className="bg-gradient-to-r from-blue-400 to-blue-600 text-white py-3 px-6 rounded-xl shadow-lg hover:scale-105 transform transition-all duration-300"
           onClick={() => window.location.reload()}
         >
           Retake Quiz
+        </button>
+        <button
+          className="bg-gradient-to-r from-purple-400 to-purple-600 text-white py-3 px-6 rounded-xl shadow-lg hover:scale-105 transform transition-all duration-300"
+          onClick={() => setReviewMode(true)}
+        >
+          View Answers
+        </button>
+
+        <button
+          className="bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-xl shadow-lg hover:scale-105 transform transition-all duration-300"
+          onClick={() => navigate("/categories")}
+        >
+          Try Another Quiz
         </button>
       </motion.div>
     );
@@ -137,41 +155,62 @@ const QuizPage = () => {
         <option value="hard">Hard</option>
       </select>
       {questions.map((question, index) => (
-        <motion.div
-          key={index}
-          className="question-card p-6 mb-6 border-2 rounded-xl shadow-lg bg-gradient-to-r from-blue-100 to-indigo-200"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2
-            className="text-xl font-semibold text-gray-800 mb-4"
-            dangerouslySetInnerHTML={{
-              __html: `${index + 1}. ${question.question}`,
-            }}
-          />
-          <ul className="options-list space-y-4">
-            {question.shuffledAnswers.map((answer, i) => (
-              <li key={i}>
-                <button
-                  className={`w-full py-3 px-5 rounded-md shadow-lg text-left transition duration-300 ${
-                    selectedAnswers[index] === answer
-                      ? "bg-blue-500 text-white transform scale-105"
-                      : "bg-white hover:bg-blue-50"
-                  }`}
-                  dangerouslySetInnerHTML={{ __html: answer }}
-                  onClick={() => handleAnswerSelect(index, answer)}
-                />
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      ))}
+  <motion.div
+    key={index}
+    className="question-card p-6 mb-6 border-2 rounded-xl shadow-lg bg-gradient-to-r from-blue-100 to-indigo-200"
+    initial={{ opacity: 0, x: -50 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    <h2
+      className="text-xl font-semibold text-gray-800 mb-4"
+      dangerouslySetInnerHTML={{
+        __html: `${index + 1}. ${question.question}`,
+      }}
+    />
+    <ul className="options-list space-y-4">
+      {question.shuffledAnswers.map((answer, i) => {
+        const isCorrect = answer === question.correct_answer;
+        const isSelected = selectedAnswers[index] === answer;
+        let buttonStyle = "bg-white hover:bg-blue-50"; // Default
+
+        if (reviewMode) {
+          if (isSelected && isCorrect) {
+            buttonStyle = "bg-green-500 text-white"; // Correct selection (green)
+          } else if (isSelected && !isCorrect) {
+            buttonStyle = "bg-red-500 text-white"; // Wrong selection (red)
+          } else if (!isSelected && isCorrect) {
+            buttonStyle = "bg-green-300 text-white"; // Correct answer (green)
+          }
+        } else {
+          if (isSelected) {
+            buttonStyle = "bg-blue-500 text-white transform scale-105"; // Selected option
+          }
+        }
+
+        return (
+          <li key={i}>
+            <button
+              className={`w-full py-3 px-5 rounded-md shadow-lg text-left transition duration-300 ${buttonStyle}`}
+              dangerouslySetInnerHTML={{ __html: answer }}
+              onClick={() => !reviewMode && handleAnswerSelect(index, answer)}
+            />
+          </li>
+        );
+      })}
+    </ul>
+  </motion.div>
+))}
+
+
       <div className="text-center mt-20">
         <button
           className="bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-xl shadow-lg hover:scale-105 transform transition-all duration-300"
           onClick={handleFinishQuiz}
-          disabled={Object.keys(selectedAnswers).length !== questions.length}
+          disabled={
+            Object.keys(selectedAnswers).length !== questions.length ||
+            reviewMode
+          }
         >
           Finish Quiz
         </button>
