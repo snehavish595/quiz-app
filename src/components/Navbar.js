@@ -1,11 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
 
 const Navbar = () => {
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("darkMode") === "true";
+  });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("darkMode", darkMode);
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   return (
-    <nav className="bg-gradient-to-r from-indigo-500 via-purple-600 to-blue-500 shadow-lg fixed top-0 left-0 w-full z-50">
+    <nav className={`shadow-lg fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
+      darkMode ? "bg-gray-900" : "bg-gradient-to-r from-indigo-500 via-purple-600 to-blue-500"
+    }`}>
       <div className="container mx-auto px-6 py-3 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold text-white tracking-wide">
@@ -13,7 +32,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex space-x-6 items-center">
           <Link
             to="/"
             className="text-white text-base font-medium hover:text-yellow-400 transition duration-300"
@@ -38,6 +57,13 @@ const Navbar = () => {
           >
             Contact
           </Link>
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-full bg-white/10 backdrop-blur-md border border-white/30 hover:scale-110 transition-transform duration-300 text-white text-2xl shadow-md"
+          >
+            {darkMode ? <MdLightMode className="text-yellow-400 transition-all duration-300" /> : <MdDarkMode className="text-gray-300 transition-all duration-300" />}
+          </button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -81,7 +107,7 @@ const Navbar = () => {
 
       {/* Mobile Dropdown Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-purple-700 text-white">
+        <div className="md:hidden bg-purple-700 dark:bg-gray-800 text-white">
           <div className="flex flex-col space-y-2 py-4 px-6">
             <Link
               to="/"
